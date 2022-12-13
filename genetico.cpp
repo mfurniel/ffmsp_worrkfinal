@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-
 #include <algorithm>
 #include <chrono>
 #include <fstream>
@@ -17,20 +16,15 @@
 using namespace std;
 
 vector<char> champion;
-int champion_fitness;
+int champion_fitness=0;
 int tamPoblacion;
 int campeon(vector<vector<char>> muestra) {
-    // int fitind;
-    int fitcampeon = fitness(muestra[0]);
-    // int ind = 0;
+    int fitcampeon = fitness(muestra[0]);  
     for (int i = 0; i < muestra.size(); i++) {
         if (fitcampeon < fitness(muestra[i])) {
-            fitcampeon = fitness(muestra[i]);
-            // ind = i;
+            fitcampeon = fitness(muestra[i]);        
         }
     }
-    // fitind.push_back(fitcampeon);
-    // fitind.push_back(ind);
     return fitcampeon;
 }
 
@@ -45,20 +39,13 @@ bool checkrep(int rep, vector<int> indices) {
 
 vector<char> pGreedy(const string &nombreArchivo, const float &threshold,
                      const float &nivelDeDeterminismo) {
-    // cout << nombreArchivo << "\t" << threshold << "\t" << nivelDeDeterminismo
-    //      << endl;
     vector<pair<int, string>> newEmpates;
     empates = move(newEmpates);
-    // vector<string> w;
-    leerArchivo(nombreArchivo, threshold, w, nivelDeDeterminismo);
-    // for (auto it = w.begin(); it != w.end(); it++)
-    // {
-    //     cout << *it << endl;
-    // }
+    // leerArchivo(nombreArchivo, threshold, w, nivelDeDeterminismo);
     vector<char> wordfinal;
 
-    clock_t start;
-    tiempo = 0.0;  // resetear tiempo
+    // clock_t start;
+    // tiempo = 0.0;  // resetear tiempo
 
     start = (double)clock();
 
@@ -76,9 +63,7 @@ vector<char> pGreedy(const string &nombreArchivo, const float &threshold,
             alfap[2].first = 0;
             alfap[3].first = 0;
 
-            //    cout<<"b"<<endl;
             for (int i = 0; i < N; i++) {
-                // cout << i << " " << N << endl;
                 if (w[i][iteracion] == 'A') {
                     alfap[0].first++;
                 }
@@ -93,52 +78,30 @@ vector<char> pGreedy(const string &nombreArchivo, const float &threshold,
                 }
             }
 
-            // cout<<"a"<<endl;
             sort(alfap.begin(), alfap.end());
 
-            // for(size_t i = 1; i < alfap.size(); i++){
-
-            //     if(alfap[i-1].first == alfap[i].first){
-            //         wordfinal.push_back(alfap[rand()%i].second);
-            //     }
-            // }
-
-            // wordfinal.push_back(alfap[0].second);
-
             if (alfap[0].first == alfap[3].first) {
-                // cout<<"empate3 "<<iteracion<<endl;
                 wordfinal.push_back(alfap[rand() % 4].second);
                 pair<int, string> aux;
                 aux.first = iteracion;
                 for (int i = 0; i < 4; i++) {
-                    // if (wordfinal[iteracion]!=alfap[i].second)
-                    // {
                     aux.second.push_back(alfap[i].second);
-                    // }
                 }
                 empates.push_back(aux);
             } else if (alfap[0].first == alfap[2].first) {
-                // cout<<"empate2 "<<iteracion<<endl;
                 wordfinal.push_back(alfap[rand() % 3].second);
                 pair<int, string> aux;
                 aux.first = iteracion;
                 for (int i = 0; i < 3; i++) {
-                    // if (wordfinal[iteracion]!=alfap[i].second)
-                    // {
                     aux.second.push_back(alfap[i].second);
-                    // }
                 }
                 empates.push_back(aux);
             } else if (alfap[0].first == alfap[1].first) {
-                // cout<<"empate1 "<<iteracion<<endl;
                 wordfinal.push_back(alfap[rand() % 2].second);
                 pair<int, string> aux;
                 aux.first = iteracion;
                 for (int i = 0; i < 2; i++) {
-                    // if (wordfinal[iteracion]!=alfap[i].second)
-                    // {
                     aux.second.push_back(alfap[i].second);
-                    // }
                 }
                 empates.push_back(aux);
             } else {
@@ -152,18 +115,10 @@ vector<char> pGreedy(const string &nombreArchivo, const float &threshold,
 
     } while (iteracion < M);
 
-    // muestra string generado
-    // cout << "wordfinal: ";
-    // for (int i = 0; i < M; i++) {
-    //     cout << wordfinal[i];
-    // }
-    // cout << endl;
-
     int p = 0;
     int dif = 0;
 
     for (int i = 0; i < N; i++) {
-        // cout<<w[i]<<" "<< th <<endl;
         dif = 0;
         for (int j = 0; j < M; j++) {
             if (wordfinal[j] != w[i][j]) {
@@ -174,66 +129,40 @@ vector<char> pGreedy(const string &nombreArchivo, const float &threshold,
             p++;
         }
     }
-    f_i = p;
-    // puntaje
+    f_i = p; // puntaje
     tiempo += ((double)clock() - start);
     tiempo = tiempo / (double)CLOCKS_PER_SEC;
-
-    // cout << p << '\t' << tiempo << endl;
-    // cout << p << endl;
     return wordfinal;
 }
 
-bool localSearch2(vector<char> &wordfinal) {
-    // cout<<"test1"<<endl;
-    // calcula fitness final
+vector<char> localSearch(vector<char> &wordfinal) {
+
     int fitnessWordfinal = 0;
     fitnessWordfinal = fitness(wordfinal);
-
-    // cout<<"test2"<<endl;
     int largo = empates.size();
-    // en cuantas columnas hubo empate
+   
     for (int i = 0; i < largo; i++) {
         int columna = empates[i].first;
-        // cout<<empates[i].first<<endl; |
-        // cout<<"test3: largo"<<largo<<endl;
-        // cout<<"test3.5: columna"<<columna<<endl;
-        vector<char> vecino = wordfinal;
-        // for (int i = 0; i < wordfinal.size(); i++) {
-        //     cout<<vecino[i];
-        // }
-        // cout<<endl;
-        for (int k = 0; k < empates[i].second.size(); k++) {
-            // empates.first es la columna y second son los caracteres
-
-            vecino[columna] = empates[i].second[k];
-            vecino[empates[rand() % empates.size()].first] =
-                empates[rand() % empates.size()].second[rand() % 4];
-            // vecino[empates.size()-k]=empates[rand()%empates.size()].second[k];
-
-            // vecino[empates[rand()%empates.size()].first]=empates[rand()%empates.size()].second[rand()%4];
-            // vecino[rand()%M]=genes[rand()%4];
-
-            // cout<<"test4"<<endl;
-            // cout<<empates[i].second[k]<<endl;
-            // vecino[columna]=empates[i].second[k];
-            int fitnessVecino = 0;
-            // cout<<"test5"<<endl;
-            // calcular fitness de wordfinal y vecino y comparar
-            fitnessVecino = fitness(vecino);
-            if (fitnessVecino >= fitnessWordfinal) {
-                wordfinal = vecino;
-                if (fitnessVecino > fitnessWordfinal) {
-                    cout << fitnessWordfinal << "\t";
-                    return true;
+        vector<char> vecino = wordfinal;          
+        int columnaRandom= rand() % empates.size();
+        vecino[empates[columnaRandom].first] = empates[columnaRandom].second[rand() % 4];
+        columnaRandom= rand() % empates.size();
+        vecino[empates[columnaRandom].first] = empates[columnaRandom].second[rand() % 4];
+        int fitnessVecino = 0;
+        fitnessVecino = fitness(vecino);
+        if (fitnessVecino >= fitnessWordfinal) {
+            wordfinal = vecino;
+            if (fitnessVecino > fitnessWordfinal) {
+                // cout << fitnessWordfinal << "\t";
+                champion_fitness= fitnessWordfinal;
+                champion=wordfinal;
+                    return wordfinal;
                 }
-                fitnessWordfinal = fitnessVecino;
-                // cout << "uh?" << endl;
+                fitnessWordfinal = fitnessVecino;      
             }
         }
-    }
-
-    return false;
+    vector<char> nada;
+    return nada;
 }
 
 void mutar(vector<char> &mijo, float nivelDeMutacion) {
@@ -241,7 +170,6 @@ void mutar(vector<char> &mijo, float nivelDeMutacion) {
     // entre mayor el nivel de mutacion tonces mas deberia poder mutar
     // imprime(mijo);
     nivelDeMutacion *= 100;
-
     for (int i = 0; i < M; i++) {
         if (rand() % 101 <= nivelDeMutacion) {
             char aux = mijo[i];
@@ -250,63 +178,42 @@ void mutar(vector<char> &mijo, float nivelDeMutacion) {
             }
         }
     }
-    // cout << endl;
-    // imprime(mijo);
 }
 
 void evaluar(vector<vector<char>> pobla, int tamPobla) {  //????
+
     for (int i = 0; i < tamPobla; i++) {
         int mijo_fitness = fitness(pobla[i]);
         if (mijo_fitness > champion_fitness) {
-            champion = pobla[i];  // deberia ser move(pobla[i])??
+            champion = pobla[i];  
             champion_fitness = mijo_fitness;
-            // cout << champion_fitness << endl;
         }
     }
 }
 
 void spawnPoblacion(const string &nombreArchivo, const float &threshold,
                     const float &nivelDeDeterminismo) {
-//    pGreedy(nombreArchivo, threshold, nivelDeDeterminismo);
-//     tamPoblacion=empates.size();
-//    vector<vector<char>> pacual;
-//     cout<<"a"<<endl;
-    for ( int i = 0; i < tamPoblacion; i++)
+
+    for (int i = 0; i < tamPoblacion; i++)
     {
-        
+        vector<char> mijo =
+        localSearch();
+        lapobla.push_back(mijo);
+    }
+    
+    for ( int i = 0; i < tamPoblacion; i++) {
         vector<char> mijo =
         pGreedy(nombreArchivo, threshold, nivelDeDeterminismo);
         lapobla.push_back(mijo);
-    
-        //  cout<<i<<endl;
-        // vector<char>aux;
-        // for (int j = 0; j < M; j++)
-        // {  
-        //     cout<<w[11][0]<<endl;
-        //    aux.push_back(w[empates[i].first][j]);
-        // } 
-        // pacual.push_back(aux);
-        // cout<<"emp: "<<empates.size()<<endl;
-        // cout<<"pacualsize: "<<pacual.size()<<endl;
     }
-//    cout<<"b"<<endl;
-   
-//     for (int i = 0; i < pacual.size(); i++) {
-        
-//         vector<char> mijo = pacual[i];
-          
-//         lapobla.push_back(mijo);
-//     }
-    
+
 }
 
 vector<vector<char>> mortalKombat(vector<vector<char>> winersactual) {
     vector<vector<char>> winersfuturo;
-    // cout << "ma" << endl;
     if (winersactual.size() == 2) {
         return winersactual;
     }
-    // cout << "ma1" << endl;
     for (int i = 0; i < winersactual.size(); i = i + 2) {
         if (i + 1 >= winersactual.size()) {
             winersfuturo.push_back(winersactual[i]);
@@ -318,15 +225,14 @@ vector<vector<char>> mortalKombat(vector<vector<char>> winersactual) {
             winersfuturo.push_back(winersactual[i + 1]);
         }
     }
-    // cout << "mb" << endl;
     winersactual = winersfuturo;
     return mortalKombat(winersactual);
 }
-// vector<char> crossover(vector<char> &padre1, vector<char> &padre2);
+
 void crossover(vector<vector<char>> &aux, vector<vector<char>> &padres,
                vector<char> &padre1, vector<char> &padre2,
                const float nivelDeMutacion) {
-    // vector<vector<char>> aux;
+   
     vector<char> hijo1;
     vector<char> hijo2;
     for (int i = 0; i < M; i++) {
@@ -341,30 +247,16 @@ void crossover(vector<vector<char>> &aux, vector<vector<char>> &padres,
     }
     mutar(hijo1, nivelDeMutacion);
     mutar(hijo2, nivelDeMutacion);
-
     aux.push_back(hijo1);
     aux.push_back(hijo2);
 
-    // return aux;
+ 
 }
 
 vector<vector<char>> fight() {
-    // cout << "tam: " << lapobla.size() << endl;
     vector<vector<char>> padres;
     for (int i = 0; i < 2; i++) {
-        // cout << i << endl;
-        // vector<char> candidato;
-        // int fitness_candidato = 0;
-        // for (int j = 0; j < 3; j++) {
-        //     cout << j << endl;
-        //     int aux = rand() % tamPoblacion;
-        //     int fitness_aux = fitness(lapobla[aux]);
-        //     if (fitness_aux > fitness_candidato) {
-        //         candidato = lapobla[aux];
-        //         fitness_candidato = fitness_aux;
-        //     }
-        //     padres.push_back(candidato);
-        // }
+      
 
         int azar = rand() % tamPoblacion;
         padres.push_back(lapobla[azar]);
@@ -375,12 +267,10 @@ vector<vector<char>> fight() {
 void degeneracion(vector<vector<char>> &lapobla, float nivelDeMutacion,
                   const float newG, const int &tamPoblacion) {
     vector<vector<char>> aux;
-
     int totalMijos = tamPoblacion * newG / 2;
     if (totalMijos % 2 == 1) {
         totalMijos--;
     }
-    // cout << "total de hijos = " << totalMijos << endl;
     for (int i = 0; i < totalMijos; i++) {
         vector<vector<char>> muestra;
         for (int j = 0; j < totalMijos; j++) {
@@ -393,29 +283,14 @@ void degeneracion(vector<vector<char>> &lapobla, float nivelDeMutacion,
             indices.push_back(ind);
             muestra.push_back(lapobla[ind]);
         }
-
-        // cout << "a" << endl;
         vector<vector<char>> padres = mortalKombat(muestra);
-        // vector<vector<char>> padres = fight();
         vector<char> padre1 = padres[0];
         vector<char> padre2 = padres[1];
-
         crossover(aux, padres, padre1, padre2, nivelDeMutacion);
-        // mutar(mijo, nivelDeMutacion);
-        // aux.push_back(mijo);
     }
-    // cout << "despues de todos los hijos" << endl;
     vector<char> oldChampion = champion;
-    // cout << "uhh?? 1" << endl;
-
     evaluar(aux, totalMijos * 2);
-    // cout << "uhh?? 2" << endl;
-
-    // if (oldChampion !=
-    //     champion) {  // la generacion nueva tiene un mejor champion
-    // cout << "campeon: " << champion_fitness << endl;
     int totalDuplicados = tamPoblacion - totalMijos * 2;
-    // cout << "poblacion restante: " << totalDuplicados << endl;
     for (int i = 0; i < totalDuplicados; i++) {
         vector<int> indices;
         int ind;
@@ -426,23 +301,13 @@ void degeneracion(vector<vector<char>> &lapobla, float nivelDeMutacion,
         aux.push_back(lapobla[ind]);
     }
     lapobla = aux;
-    //  for (int m = 0; m < lapobla.size(); m++)
-    // {
-    //    cout<<fitness(lapobla[m])<<"  ";
 
-    // }
-    // cout<<endl;
-    // }
-    // else {
-    //     cout << "no hubo mjr champion" << endl;
-    // }
-    // cout << "F I N " << endl;
 }
 
 int main(int argc, const char *argv[]) {
     map<string, string> param;
     param["-i"] = "dataset/100-300-001.txt";  // instancia
-    param["--tiempo"] = "209";          // tiempo
+    param["--tiempo"] = "5";          // tiempo
     param["--th"] = "0.75";           // threshold
     param["--det"] = "0.95";          // nivelDeDeterminismo
     param["--tam"] = "100";           // tamanoPoblacion
@@ -453,29 +318,22 @@ int main(int argc, const char *argv[]) {
     for (int i = 1; i < argc - 1; i += 2) {
         param[argv[i]] = argv[i + 1];
     }
-
-    // signal(SIGCHLD, sig_handler);
-
     srand(0);
+    
+    leerArchivo(nombreArchivo, threshold, w, nivelDeDeterminismo);
     vector<char> wordfinal;
-    // alarm(stoi(param["-tiempo"]));
-
-    champion_fitness = 0;
-    tamPoblacion = stoi(param["--tam"]);
-    spawnPoblacion(param["-i"], stof(param["--th"]), stof(param["--det"]));
-
-    evaluar(lapobla, tamPoblacion);
-    // for (int i = 0; i < tamPoblacion; i++) {
-    //     imprime(lapobla[i]);
-    //     cout << "\n" << i << endl;
-    // }
+    wordfinal = pGreedy( param["-i"], stof(param["--th"]), stof(param["--det"]) );
     int porfavorDetente = stoi(param["--tiempo"]);
+
     while ((tiempo / (double)CLOCKS_PER_SEC) < porfavorDetente) {
-        clock_t start = clock();
-        degeneracion(lapobla, stof(param["--mut"]), stof(param["--newG"]),
-                     stoi(param["--tam"]));
+        clock_t start= clock();
+        tiempo = tiempo;
+        localSearch(wordfinal);
+
         tiempo += ((double)clock() - start);
     }
-    cout << champion_fitness * -1 << endl;
+    cout << -1*champion_fitness << endl;
+
+
     return 0;
 }
