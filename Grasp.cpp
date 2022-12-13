@@ -8,10 +8,8 @@
 #include <time.h>
 #include <chrono>
 #include <iomanip>
-
 #include <unistd.h>
 #include <signal.h>
-
 using namespace std;
 
 int N, M, th, alpha;
@@ -388,7 +386,7 @@ bool localSearch2(vector<char> &wordfinal) {
 
             int no_empate_random = rand() % 100;
 
-            if (fitnessWordfinal<90){
+            if (fitnessWordfinal<90000){
                 int columnaRandom= rand() % empates.size();
                 vecino[empates[columnaRandom].first] = empates[columnaRandom].second[rand() % 4];
                 columnaRandom= rand() % empates.size();
@@ -497,7 +495,7 @@ int main(int argc, const char *argv[])
 
         // int porfavor_detente= 90;
         // alarm(porfavor_detente);
-        wordfinal = pGreedy("100-300-001.txt", "0.80", "1");
+        wordfinal = pGreedy("200-300-001.txt", "0.80", "1");
         // alobruto();
        
     }

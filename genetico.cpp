@@ -44,8 +44,8 @@ vector<char> pGreedy(const string &nombreArchivo, const float &threshold,
     // leerArchivo(nombreArchivo, threshold, w, nivelDeDeterminismo);
     vector<char> wordfinal;
 
-    // clock_t start;
-    // tiempo = 0.0;  // resetear tiempo
+    clock_t start;
+    tiempo = 0.0;  // resetear tiempo
 
     start = (double)clock();
 
@@ -142,7 +142,7 @@ vector<char> localSearch(vector<char> &wordfinal) {
     int largo = empates.size();
    
     for (int i = 0; i < largo; i++) {
-        int columna = empates[i].first;
+        
         vector<char> vecino = wordfinal;          
         int columnaRandom= rand() % empates.size();
         vecino[empates[columnaRandom].first] = empates[columnaRandom].second[rand() % 4];
@@ -153,13 +153,15 @@ vector<char> localSearch(vector<char> &wordfinal) {
         if (fitnessVecino >= fitnessWordfinal) {
             wordfinal = vecino;
             if (fitnessVecino > fitnessWordfinal) {
-                // cout << fitnessWordfinal << "\t";
+                cout << fitnessWordfinal << "\t";
                 champion_fitness= fitnessWordfinal;
                 champion=wordfinal;
                     return wordfinal;
                 }
                 fitnessWordfinal = fitnessVecino;      
             }
+            vector<char> nada;
+            return nada;
         }
     vector<char> nada;
     return nada;
@@ -193,20 +195,28 @@ void evaluar(vector<vector<char>> pobla, int tamPobla) {  //????
 
 void spawnPoblacion(const string &nombreArchivo, const float &threshold,
                     const float &nivelDeDeterminismo) {
-
-    for (int i = 0; i < tamPoblacion; i++)
-    {
-        vector<char> mijo =
-        localSearch();
-        lapobla.push_back(mijo);
+    vector<char> aux = pGreedy(nombreArchivo, threshold, 1.0);
+    float tempo=0.0;
+    cout<<"aaaa1: "<<lapobla.size()<<endl;
+    while (lapobla.size()<tamPoblacion && ((tempo / (double)CLOCKS_PER_SEC) < 10)) {
+        clock_t start= clock();
+        vector<char> mijo = localSearch(aux);
+       
+        if (mijo.size()>1)  {
+            lapobla.push_back(mijo);
+        }
+        tempo += ((double)clock() - start);
     }
-    
-    for ( int i = 0; i < tamPoblacion; i++) {
+    alpha=50;
+    cout<<"aaaa: "<<lapobla.size()<<endl;
+    int cont = lapobla.size();
+    for ( int i = 0; i < tamPoblacion - cont; i++) {
         vector<char> mijo =
-        pGreedy(nombreArchivo, threshold, nivelDeDeterminismo);
+        pGreedy(nombreArchivo, threshold, 0.80);
         lapobla.push_back(mijo);
+       
     }
-
+cout<<"aaa11a: "<<lapobla.size()<<endl;
 }
 
 vector<vector<char>> mortalKombat(vector<vector<char>> winersactual) {
@@ -304,12 +314,45 @@ void degeneracion(vector<vector<char>> &lapobla, float nivelDeMutacion,
 
 }
 
+// int main(int argc, const char *argv[]) {
+//     map<string, string> param;
+//     param["-i"] = "dataset/100-300-001.txt";  // instancia
+//     param["--tiempo"] = "15";          // tiempo
+//     param["--th"] = "0.75";           // threshold
+//     param["--det"] = "0.95";          // nivelDeDeterminismo
+//     param["--tam"] = "100";           // tamanoPoblacion
+//     param["--mut"] = "0.05";          // nivelDeMutacion
+//     param["--newG"] = "0.80";  // porcentaje de la siguiente poblacion compuesta
+//                                // por la nueva generacion
+
+//     for (int i = 1; i < argc - 1; i += 2) {
+//         param[argv[i]] = argv[i + 1];
+//     }
+//     srand(0);
+    
+//     leerArchivo( param["-i"], stof(param["--th"]),w,stof(param["--det"]));
+//     vector<char> wordfinal;
+//     wordfinal = pGreedy( param["-i"], stof(param["--th"]), stof(param["--det"]) );
+//     int porfavorDetente = stoi(param["--tiempo"]);
+
+//     while ((tiempo / (double)CLOCKS_PER_SEC) < porfavorDetente) {
+//         clock_t start= clock();
+//         localSearch(wordfinal);
+
+//         tiempo += ((double)clock() - start);
+//     }
+//     cout << -1*champion_fitness << endl;
+
+
+//     return 0;
+// }
+
 int main(int argc, const char *argv[]) {
     map<string, string> param;
-    param["-i"] = "dataset/100-300-001.txt";  // instancia
-    param["--tiempo"] = "5";          // tiempo
-    param["--th"] = "0.75";           // threshold
-    param["--det"] = "0.95";          // nivelDeDeterminismo
+    param["-i"] = "dataset/100-600-002.txt";  // instancia
+    param["--tiempo"] = "12";          // tiempo
+    param["--th"] = "0.80";           // threshold
+    param["--det"] = "1";          // nivelDeDeterminismo
     param["--tam"] = "100";           // tamanoPoblacion
     param["--mut"] = "0.05";          // nivelDeMutacion
     param["--newG"] = "0.80";  // porcentaje de la siguiente poblacion compuesta
@@ -318,22 +361,31 @@ int main(int argc, const char *argv[]) {
     for (int i = 1; i < argc - 1; i += 2) {
         param[argv[i]] = argv[i + 1];
     }
+
+    // signal(SIGCHLD, sig_handler);
+
+    leerArchivo(param["-i"], stof(param["--th"]), w, stof(param["--det"]));
+
     srand(0);
-    
-    leerArchivo(nombreArchivo, threshold, w, nivelDeDeterminismo);
     vector<char> wordfinal;
-    wordfinal = pGreedy( param["-i"], stof(param["--th"]), stof(param["--det"]) );
+    // alarm(stoi(param["-tiempo"]));
+
+    champion_fitness = 0;
+    tamPoblacion = stoi(param["--tam"]);
+    spawnPoblacion(param["-i"], stof(param["--th"]), stof(param["--det"]));
+
+    evaluar(lapobla, tamPoblacion);
+    // for (int i = 0; i < tamPoblacion; i++) {
+    //     imprime(lapobla[i]);
+    //     cout << "\n" << i << endl;
+    // }
     int porfavorDetente = stoi(param["--tiempo"]);
-
     while ((tiempo / (double)CLOCKS_PER_SEC) < porfavorDetente) {
-        clock_t start= clock();
-        tiempo = tiempo;
-        localSearch(wordfinal);
-
+        clock_t start = clock();
+        degeneracion(lapobla, stof(param["--mut"]), stof(param["--newG"]),
+                     stoi(param["--tam"]));
         tiempo += ((double)clock() - start);
     }
-    cout << -1*champion_fitness << endl;
-
-
+    cout << champion_fitness * -1 << endl;
     return 0;
 }
